@@ -3,6 +3,7 @@ import { Form, Grid } from 'semantic-ui-react';
 import { withFormik, ErrorMessage } from 'formik';
 import { connect } from "react-redux";
 import { withRouter } from "react-router";
+import { submitUserInfo } from '../../actions';
 import * as Yup from 'yup';
 
 const options = [
@@ -20,8 +21,7 @@ function FormComponent(props) {
         handleBlur,
         handleSubmit,
       } = props;
-    console.log('The form values are', values);
-    // console.log('errors are', errors);
+    // console.log('inside the form component', values);
     return (
         <Grid>
             <Grid.Row>
@@ -115,11 +115,12 @@ function FormComponent(props) {
 
 const mapStateToProps = state => {
     // extract the reducer which is needed by detructuring
+    console.log('inside map state to props', state.formReducer);
     return state;
 }
 // initialize the values if these values are coming from props like - redux state
 const mapPropsToValues = (props = {}) => {
-    console.log('inside the map props to values ', props);
+    // console.log('inside the map props to values ', props);
     const { formReducer } = props;
     return ({
         ...formReducer
@@ -144,13 +145,17 @@ const validationSchema = Yup.object({
   });
 
 
-export default withRouter(connect(mapStateToProps, {})(withFormik({
+export default withRouter(connect(mapStateToProps,
+    {
+        submitUserInfo, 
+    })(withFormik({
     mapPropsToValues,
     validationSchema,
-    handleSubmit: (values, { setSubmitting }) => { // pass a different function here
+    handleSubmit: (values, { setSubmitting, props }) => { // pass a different function here
         setTimeout(() => {
           alert(JSON.stringify(values, null, 2));
           setSubmitting(false);
+          props.submitUserInfo(values);
         }, 1000);
     },
     enableReinitialize: true,
